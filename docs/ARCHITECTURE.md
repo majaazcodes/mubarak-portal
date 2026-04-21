@@ -58,12 +58,15 @@ Full schema lives in `apps/api/src/db/schema/`. For now, the invariants:
 
 - Every row belongs to an **agency** (`agency_id FK, NOT NULL`). No orphaned data.
 - **Multi-tenant enforcement** happens at the query layer — every repository method accepts (or derives) `agencyId` and filters on it. This is an invariant verified by tests and audit logs, not a convention.
-- Primary entities (pilot scope):
+- Primary entities (pilot scope — Option A):
   - `agencies` — tenant root
-  - `users` — agency staff; role ∈ `super_admin | agency_admin | operator | viewer`
-  - `pilgrims` — agency's customers; status ∈ `registered | visa_pending | visa_approved | traveled | in_makkah | in_madinah | completed | cancelled`
-  - `bookings`, `flights`, `rooms`, `groups` — operational entities (schema TBD)
-  - `audit_logs` — every mutation, indexed by agency + actor + timestamp
+  - `users` — agency staff; role ∈ `super_admin | agency_admin | operator | viewer`. `agency_id` is nullable **only** for `super_admin`, enforced by a DB CHECK constraint.
+  - `pilgrims` — agency's customers; status ∈ `pending | active | completed | issue` (pilot); generated `tsvector` column for search.
+  - `groups` — departure cohorts; `pilgrim_groups` is the M:N junction.
+  - `qr_codes` — 1:1 per pilgrim; `token` is base64url of 32 random bytes, uniquely indexed (hot path for mobile scan).
+  - `scan_logs` — append-only audit of QR scans with offline-sync metadata.
+  - `audit_logs` — every mutation, indexed by agency + actor + timestamp.
+  - `bookings`, `flights`, `rooms` — deferred to post-pilot; not in initial schema.
 
 ## Multi-tenancy Enforcement
 
