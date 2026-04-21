@@ -29,17 +29,17 @@ const tsvector = customType<{ data: string; driverData: string }>({
   },
 });
 
-export type EmergencyContact = {
+export interface EmergencyContact {
   name: string;
   phone: string;
   relation: string;
-};
+}
 
-export type PilgrimTravel = {
+export interface PilgrimTravel {
   flightNo?: string;
   arrivalDate?: string;
   hotelName?: string;
-};
+}
 
 export const pilgrims = pgTable(
   "pilgrims",

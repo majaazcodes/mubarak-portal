@@ -12,7 +12,9 @@ export const sql = postgres(databaseUrl, {
   max: 10,
   idle_timeout: 30,
   connect_timeout: 10,
-  onnotice: () => {},
+  onnotice: () => {
+    // silence postgres-js notice stream
+  },
 });
 
 export const db = drizzle(sql, { schema });

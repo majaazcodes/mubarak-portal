@@ -40,7 +40,6 @@ export function validateEnv(raw: Record<string, unknown>): Env {
     const errors = parsed.error.issues
       .map((i) => `  - ${i.path.join(".")}: ${i.message}`)
       .join("\n");
-    // eslint-disable-next-line no-console
     console.error(`\n[config] Invalid environment variables:\n${errors}\n`);
     process.exit(1);
   }

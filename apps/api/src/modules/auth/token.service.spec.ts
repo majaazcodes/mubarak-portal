@@ -11,7 +11,7 @@ class MockRedis {
   private ttls = new Map<string, number>();
 
   async get(key: string): Promise<string | null> {
-    return this.kv.has(key) ? this.kv.get(key)! : null;
+    return this.kv.get(key) ?? null;
   }
   async set(
     key: string,
@@ -67,7 +67,7 @@ class MockRedis {
 }
 
 class MockRedisMulti {
-  private ops: Array<() => Promise<unknown>> = [];
+  private ops: (() => Promise<unknown>)[] = [];
   constructor(private readonly r: MockRedis) {}
   del(key: string): this {
     this.ops.push(() => this.r.del(key));
@@ -89,8 +89,8 @@ class MockRedisMulti {
     });
     return this;
   }
-  async exec(): Promise<Array<[Error | null, unknown]>> {
-    const out: Array<[Error | null, unknown]> = [];
+  async exec(): Promise<[Error | null, unknown][]> {
+    const out: [Error | null, unknown][] = [];
     for (const op of this.ops) {
       try {
         out.push([null, await op()]);

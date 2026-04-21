@@ -15,7 +15,12 @@ async function main(): Promise<void> {
     throw new Error("DATABASE_URL is not set");
   }
 
-  const sql = postgres(databaseUrl, { max: 1, onnotice: () => {} });
+  const sql = postgres(databaseUrl, {
+    max: 1,
+    onnotice: () => {
+      // silence postgres-js notice stream
+    },
+  });
 
   console.log("[reset] dropping and recreating schemas (public + drizzle)");
   await sql.unsafe("DROP SCHEMA IF EXISTS public CASCADE;");

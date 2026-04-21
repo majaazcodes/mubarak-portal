@@ -9,7 +9,12 @@ async function main(): Promise<void> {
     throw new Error("DATABASE_URL is not set");
   }
 
-  const sql = postgres(databaseUrl, { max: 1, onnotice: () => {} });
+  const sql = postgres(databaseUrl, {
+    max: 1,
+    onnotice: () => {
+      // silence postgres-js notice stream
+    },
+  });
   const db = drizzle(sql);
 
   const start = Date.now();
