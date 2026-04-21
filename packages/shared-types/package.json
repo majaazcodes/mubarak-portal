@@ -1,0 +1,20 @@
+{
+  "name": "@hajj/shared-types",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "types": "./src/index.ts",
+  "scripts": {
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit",
+    "test": "echo \"(no tests in shared-types yet)\" && exit 0"
+  },
+  "devDependencies": {
+    "@hajj/shared-config": "workspace:*",
+    "eslint": "^9.17.0",
+    "typescript": "^5.7.2"
+  }
+}

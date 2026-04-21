@@ -1,0 +1,18 @@
+{
+  "expo": {
+    "name": "Hajj Mobile",
+    "slug": "hajj-mobile",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "platforms": ["ios", "android"],
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.mubaraktravels.hajj"
+    },
+    "android": {
+      "package": "com.mubaraktravels.hajj"
+    }
+  }
+}
