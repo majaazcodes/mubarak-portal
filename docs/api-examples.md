@@ -41,7 +41,7 @@ Response:
   "user": {
     "id": "9e6a6169-528f-41f7-968a-1b55ee08dc8c",
     "email": "admin@mubarak.com",
-    "fullName": "Ghouse Mubarak",
+    "fullName": "Majaaz",
     "role": "agency_admin",
     "agencyId": "6f62cdcd-81e1-4ae2-b000-de31079d3471"
   }

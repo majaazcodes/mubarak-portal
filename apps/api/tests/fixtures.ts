@@ -60,7 +60,7 @@ export async function resetAndSeed(): Promise<FixtureData> {
         email: "admin@mubarak.com",
         passwordHash: agencyAdminHash,
         role: "agency_admin",
-        fullName: "Ghouse Mubarak",
+        fullName: "Majaaz",
         status: "active",
       },
       {

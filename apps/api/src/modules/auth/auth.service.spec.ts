@@ -28,7 +28,7 @@ async function buildActiveUser(
     email: "admin@mubarak.com",
     passwordHash: await hash(password, ARGON_OPTS),
     role: "agency_admin",
-    fullName: "Ghouse Mubarak",
+    fullName: "Majaaz",
     phone: null,
     status: "active",
     lastLoginAt: null,

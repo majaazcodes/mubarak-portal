@@ -246,7 +246,7 @@ async function main(): Promise<void> {
           email: "admin@mubarak.com",
           passwordHash: agencyAdminHash,
           role: "agency_admin",
-          fullName: "Ghouse Mubarak",
+          fullName: "Majaaz",
           status: "active",
         },
         {
@@ -327,14 +327,11 @@ async function main(): Promise<void> {
         maxSize: 250,
       },
     ];
-    const insertedGroups = await tx
-      .insert(groups)
-      .values(groupDefs)
-      .returning({
-        id: groups.id,
-        name: groups.name,
-        departureDate: groups.departureDate,
-      });
+    const insertedGroups = await tx.insert(groups).values(groupDefs).returning({
+      id: groups.id,
+      name: groups.name,
+      departureDate: groups.departureDate,
+    });
     console.log(`✓ (${Date.now() - t}ms)`);
 
     // Step 6: 1000 pilgrims
