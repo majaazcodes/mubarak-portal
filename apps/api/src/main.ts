@@ -2,6 +2,7 @@ import "reflect-metadata";
 import "dotenv/config";
 import fastifyCors from "@fastify/cors";
 import fastifyHelmet from "@fastify/helmet";
+import fastifyMultipart from "@fastify/multipart";
 import { ValidationPipe } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { NestFactory } from "@nestjs/core";
@@ -36,6 +37,15 @@ async function bootstrap(): Promise<void> {
   await app.register(fastifyCors, {
     origin: corsOrigin,
     credentials: true,
+  });
+  // Multipart for bulk CSV/XLSX imports. attachFieldsToBody defaults to false,
+  // so JSON routes are unaffected — controller pulls the file via req.file().
+  await app.register(fastifyMultipart, {
+    limits: {
+      fileSize: 5 * 1024 * 1024, // 5 MB
+      files: 1,
+      fields: 5,
+    },
   });
 
   registerRequestId(app.getHttpAdapter().getInstance());

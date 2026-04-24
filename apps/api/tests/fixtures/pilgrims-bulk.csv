@@ -1,0 +1,6 @@
+fullName,passportNo,dob,gender,nationality,nationalId
+Ahmed Al-Rashid,A1234567,1980-05-12,male,IN,1234567890
+Fatima Khan,B2345678,1992-11-03,female,IN,
+Omar Siddiqui,C3456789,1975-07-21,male,IN,9876543210
+Bad Date Row,D4567890,not-a-date,male,IN,
+,E5678901,1985-01-01,male,IN,

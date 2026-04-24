@@ -19,8 +19,10 @@
     "db:reset": "tsx src/db/reset.ts"
   },
   "dependencies": {
+    "@fast-csv/parse": "^5.0.5",
     "@fastify/cors": "^11.2.0",
     "@fastify/helmet": "^13.0.2",
+    "@fastify/multipart": "^10.0.0",
     "@fastify/static": "^7.0.4",
     "@hajj/shared-types": "workspace:*",
     "@nest-lab/throttler-storage-redis": "^1.2.0",
@@ -38,6 +40,7 @@
     "class-validator": "^0.15.1",
     "dotenv": "^17.4.2",
     "drizzle-orm": "^0.45.2",
+    "exceljs": "^4.4.0",
     "ioredis": "^5.10.1",
     "lodash.chunk": "^4.2.0",
     "nestjs-pino": "^4.6.1",

@@ -301,8 +301,57 @@ curl -X DELETE "http://localhost:4000/api/v1/groups/<uuid>" \
 
 ## Cache key reference (this commit)
 
-| Key                               | TTL | Invalidated on                         |
-| --------------------------------- | --- | -------------------------------------- |
-| `pilgrims:list:{agencyId}:{hash}` | 30s | pilgrim create/update/delete in agency |
-| `pilgrim:{id}`                    | 60s | that pilgrim's update/delete           |
-| `groups:{agencyId}`               | 60s | group create/update/delete in agency   |
+| Key                               | TTL | Invalidated on                               |
+| --------------------------------- | --- | -------------------------------------------- |
+| `pilgrims:list:{agencyId}:{hash}` | 30s | pilgrim create/update/delete in agency       |
+| `pilgrim:{id}`                    | 60s | that pilgrim's update/delete                 |
+| `groups:{agencyId}`               | 60s | group create/update/delete in agency         |
+| `qr:{token}`                      | 60s | QR revoke / regenerate / pilgrim soft-delete |
+
+## Bulk import (agency_admin)
+
+Two-phase flow over `multipart/form-data`. Limits: CSV or XLSX only, 5 MB max,
+up to 1000 rows. Phase 2 **always re-validates the file** — never trust the
+client to say it's unchanged.
+
+```bash
+# Phase 1 — validate only (default when ?confirm flag is absent)
+curl -X POST "http://localhost:4000/api/v1/pilgrims/bulk-import" \
+  -H "Authorization: Bearer $ADMIN_TOKEN" \
+  -F "file=@pilgrims.csv;type=text/csv"
+# ->
+# {
+#   "mode": "validate",
+#   "valid": 3,
+#   "invalid": 2,
+#   "rows":   [{ row: 2, passportNo: "A1234567", ... }, ...],
+#   "errors": [
+#     { "row": 5, "field": "dob",        "message": "dob must be YYYY-MM-DD" },
+#     { "row": 6, "field": "fullName",   "message": "must be ≥1 chars" }
+#   ]
+# }
+
+# Phase 2 — actually insert
+curl -X POST "http://localhost:4000/api/v1/pilgrims/bulk-import?confirm=true" \
+  -H "Authorization: Bearer $ADMIN_TOKEN" \
+  -F "file=@pilgrims.csv;type=text/csv"
+# -> { "mode":"commit", "inserted": 3, "skipped": 2, "errors": [...] }
+```
+
+Expected CSV/XLSX header row (order-independent, case-sensitive):
+
+```
+fullName,passportNo,dob,gender,nationality,nationalId
+```
+
+`nationality` and `nationalId` are optional; `nationality` defaults to `"IN"`
+when omitted. `gender` is `male` or `female`. `passportNo` is normalised to
+uppercase and must match `[A-Z][0-9]{7,8}`.
+
+Error codes:
+
+| HTTP | error code         | when                                    |
+| ---- | ------------------ | --------------------------------------- |
+| 400  | MULTIPART_REQUIRED | Content-Type wasn't multipart/form-data |
+| 400  | FILE_MISSING       | Multipart body had no file part         |
+| 413  | FILE_TOO_LARGE     | File exceeds 5 MB                       |
