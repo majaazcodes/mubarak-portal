@@ -131,6 +131,9 @@ importers:
       ioredis:
         specifier: ^5.10.1
         version: 5.10.1
+      lodash.chunk:
+        specifier: ^4.2.0
+        version: 4.2.0
       nestjs-pino:
         specifier: ^4.6.1
         version: 4.6.1(@nestjs/common@11.1.19(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(pino-http@11.0.0)(pino@10.3.1)(rxjs@7.8.2)
@@ -168,6 +171,9 @@ importers:
       "@nestjs/cli":
         specifier: ^11.0.21
         version: 11.0.21(@types/node@22.19.17)(esbuild@0.19.12)(prettier@3.8.3)
+      "@types/lodash.chunk":
+        specifier: ^4.2.9
+        version: 4.2.9
       "@types/node":
         specifier: ^22.10.2
         version: 22.19.17
@@ -3916,6 +3922,18 @@ packages:
     resolution:
       {
         integrity: sha512-asx5hIG9Qmf/1oStypjanR7iKTv0gXQ1Ov/jfrX6kS/EO0OFni8orbmGCn0672NHR3kXHwpAwR+B368ZGN/2rA==,
+      }
+
+  "@types/lodash.chunk@4.2.9":
+    resolution:
+      {
+        integrity: sha512-Z9VtFUSnmT0No/QymqfG9AGbfOA4O5qB/uyP89xeZBqDAsKsB4gQFTqt7d0pHjbsTwtQ4yZObQVHuKlSOhIJ5Q==,
+      }
+
+  "@types/lodash@4.17.24":
+    resolution:
+      {
+        integrity: sha512-gIW7lQLZbue7lRSWEFql49QJJWThrTFFeIMJdp3eH4tKoxm1OvEPg02rm4wCCSHS0cL3/Fizimb35b7k8atwsQ==,
       }
 
   "@types/methods@1.1.4":
@@ -8603,6 +8621,12 @@ packages:
     resolution:
       {
         integrity: sha512-TwuEnCnxbc3rAvhf/LbG7tJUDzhqXyFnv3dtzLOPgCG/hODL7WFnsbwktkD7yUV0RrreP/l1PALq/YSg6VvjlA==,
+      }
+
+  lodash.chunk@4.2.0:
+    resolution:
+      {
+        integrity: sha512-ZzydJKfUHJwHa+hF5X66zLFCBrWn5GeF28OHEr4WVWtNDXlQ/IjWKPBiikqKo2ne0+v6JgCgJ0GzJp8k8bHC7w==,
       }
 
   lodash.debounce@4.0.8:
@@ -14906,6 +14930,12 @@ snapshots:
       "@types/ms": 2.1.0
       "@types/node": 22.19.17
 
+  "@types/lodash.chunk@4.2.9":
+    dependencies:
+      "@types/lodash": 4.17.24
+
+  "@types/lodash@4.17.24": {}
+
   "@types/methods@1.1.4": {}
 
   "@types/ms@2.1.0": {}
@@ -18058,6 +18088,8 @@ snapshots:
       p-locate: 6.0.0
 
   lodash.camelcase@4.3.0: {}
+
+  lodash.chunk@4.2.0: {}
 
   lodash.debounce@4.0.8: {}
 

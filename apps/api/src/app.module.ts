@@ -10,7 +10,9 @@ import { HttpExceptionFilter } from "./common/filters/http-exception.filter";
 import { JwtAuthGuard } from "./common/guards/jwt-auth.guard";
 import { AuditInterceptor } from "./common/interceptors/audit.interceptor";
 import { AuthModule } from "./modules/auth/auth.module";
+import { GroupsModule } from "./modules/groups/groups.module";
 import { HealthModule } from "./modules/health/health.module";
+import { PilgrimsModule } from "./modules/pilgrims/pilgrims.module";
 import { RedisModule } from "./modules/redis/redis.module";
 import { UsersModule } from "./modules/users/users.module";
 
@@ -87,6 +89,8 @@ import { UsersModule } from "./modules/users/users.module";
     RedisModule,
     UsersModule,
     AuthModule,
+    PilgrimsModule,
+    GroupsModule,
     HealthModule,
   ],
   providers: [

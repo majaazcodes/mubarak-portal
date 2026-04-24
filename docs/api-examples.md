@@ -195,3 +195,114 @@ pnpm typecheck
 
 # 17. Graceful shutdown — Ctrl+C in dev server terminal
 ```
+
+## Pilgrims
+
+All pilgrim endpoints are tenant-scoped to `user.agencyId` from the JWT. They live under `/api/v1/pilgrims`.
+
+### List (paginated, searchable)
+
+```bash
+# Page + limit (page>=1, limit clamped to [1,100])
+curl "http://localhost:4000/api/v1/pilgrims?page=1&limit=20" \
+  -H "Authorization: Bearer $ADMIN_TOKEN"
+
+# Full-text search (prefix-matching, uses GIN index on search_tsv)
+curl "http://localhost:4000/api/v1/pilgrims?search=mohammed" \
+  -H "Authorization: Bearer $ADMIN_TOKEN"
+
+# Filter by group + status
+curl "http://localhost:4000/api/v1/pilgrims?groupId=<uuid>&status=active" \
+  -H "Authorization: Bearer $ADMIN_TOKEN"
+# -> { items: [...], total, page, limit, totalPages }
+```
+
+List results are cached at `pilgrims:list:{agencyId}:{hash(filters)}` for 30s. Any create/update/delete in the agency invalidates the pattern.
+
+### Get single pilgrim (with assigned groups)
+
+```bash
+curl "http://localhost:4000/api/v1/pilgrims/<uuid>" \
+  -H "Authorization: Bearer $ADMIN_TOKEN"
+# -> { ...pilgrim, groups: [{id, name}] }
+```
+
+Cached at `pilgrim:{id}` for 60s; a "view" audit row is written asynchronously on every request.
+
+### Create (agency_admin only)
+
+```bash
+curl -X POST http://localhost:4000/api/v1/pilgrims \
+  -H "Authorization: Bearer $ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "passportNo": "Z9999999",
+    "fullName": "Test Pilgrim",
+    "dob": "1970-01-01",
+    "gender": "male",
+    "nationality": "IN",
+    "emergencyContact": { "name": "Kin Test", "phone": "+919000000000", "relation": "son" },
+    "groupIds": ["<group-uuid>"]
+  }'
+# -> 201 { "pilgrim": { ...all fields } }
+# Note: QR token generation wired in Commit B; this response omits qrToken until then.
+```
+
+Duplicate `passportNo` within the same agency → **409 `PASSPORT_DUPLICATE`**.
+
+### Update (partial, agency_admin only)
+
+```bash
+curl -X PATCH "http://localhost:4000/api/v1/pilgrims/<uuid>" \
+  -H "Authorization: Bearer $ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"notes": "Updated by test", "status": "active"}'
+```
+
+Before/after JSONB diff written to `audit_logs`. Protected fields (`agencyId`, `id`, `createdAt`, `deletedAt`) are not accepted at the DTO boundary.
+
+### Delete (soft, agency_admin only)
+
+```bash
+curl -X DELETE "http://localhost:4000/api/v1/pilgrims/<uuid>" \
+  -H "Authorization: Bearer $ADMIN_TOKEN"
+# -> 204 No Content
+```
+
+Sets `deleted_at = NOW()`. Pilgrim stops appearing in `list`/`get`. QR revocation wired in Commit B.
+
+## Groups
+
+Endpoints under `/api/v1/groups`, same tenant scope as pilgrims.
+
+```bash
+# List with pilgrim count (cached 60s at groups:{agencyId})
+curl "http://localhost:4000/api/v1/groups" \
+  -H "Authorization: Bearer $ADMIN_TOKEN"
+# -> { items: [{...group, pilgrimCount: 200}] }
+
+# Create (agency_admin)
+curl -X POST http://localhost:4000/api/v1/groups \
+  -H "Authorization: Bearer $ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Group F - Chennai","departureDate":"2026-05-30","returnDate":"2026-06-20","maxSize":100}'
+
+# Update (agency_admin)
+curl -X PATCH "http://localhost:4000/api/v1/groups/<uuid>" \
+  -H "Authorization: Bearer $ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"maxSize":150}'
+
+# Delete (agency_admin)
+curl -X DELETE "http://localhost:4000/api/v1/groups/<uuid>" \
+  -H "Authorization: Bearer $ADMIN_TOKEN"
+# -> 204 if empty; 409 GROUP_HAS_PILGRIMS if any pilgrims assigned
+```
+
+## Cache key reference (this commit)
+
+| Key                               | TTL | Invalidated on                         |
+| --------------------------------- | --- | -------------------------------------- |
+| `pilgrims:list:{agencyId}:{hash}` | 30s | pilgrim create/update/delete in agency |
+| `pilgrim:{id}`                    | 60s | that pilgrim's update/delete           |
+| `groups:{agencyId}`               | 60s | group create/update/delete in agency   |

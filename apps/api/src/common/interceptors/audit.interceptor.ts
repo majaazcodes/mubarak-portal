@@ -53,8 +53,15 @@ export class AuditInterceptor implements NestInterceptor {
       return next.handle();
     }
 
-    // Skip auth endpoints — they write their own audit rows with domain-specific actions.
-    if (request.url.startsWith("/api/v1/auth/")) {
+    // Skip modules that write their own structured audit rows (before/after JSONB,
+    // or domain-specific actions like 'login', 'cross_agency_scan_attempt').
+    const selfAuditingPrefixes = [
+      "/api/v1/auth/",
+      "/api/v1/pilgrims",
+      "/api/v1/groups",
+      "/api/v1/qr/",
+    ];
+    if (selfAuditingPrefixes.some((p) => request.url.startsWith(p))) {
       return next.handle();
     }
 
