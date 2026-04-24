@@ -92,6 +92,10 @@ async function forward(
   }
   const rid = upstream.headers.get("x-request-id");
   if (rid) res.headers.set("x-request-id", rid);
+  // Forward content-disposition so binary downloads (badge PDFs, badge ZIPs)
+  // surface the backend's suggested filename to the browser.
+  const cd = upstream.headers.get("content-disposition");
+  if (cd) res.headers.set("content-disposition", cd);
   return res;
 }
 

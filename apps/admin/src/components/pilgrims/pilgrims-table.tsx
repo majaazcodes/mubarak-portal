@@ -63,6 +63,9 @@ interface PilgrimsTableProps {
   onRowClick?: (id: string) => void;
   onEdit?: (row: PilgrimListItem) => void;
   onDelete?: (row: PilgrimListItem) => void;
+  // Controlled selection. If omitted, the table falls back to internal state.
+  selection?: Record<string, boolean>;
+  onSelectionChange?: (next: Record<string, boolean>) => void;
 }
 
 export function PilgrimsTable({
@@ -72,9 +75,30 @@ export function PilgrimsTable({
   onRowClick,
   onEdit,
   onDelete,
+  selection,
+  onSelectionChange,
 }: PilgrimsTableProps) {
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [selected, setSelected] = useState<Record<string, boolean>>({});
+  const [internalSelection, setInternalSelection] = useState<
+    Record<string, boolean>
+  >({});
+  const selected = selection ?? internalSelection;
+  const setSelected = (
+    updater:
+      | Record<string, boolean>
+      | ((prev: Record<string, boolean>) => Record<string, boolean>),
+  ) => {
+    const next =
+      typeof updater === "function"
+        ? (
+            updater as (
+              prev: Record<string, boolean>,
+            ) => Record<string, boolean>
+          )(selected)
+        : updater;
+    if (onSelectionChange) onSelectionChange(next);
+    else setInternalSelection(next);
+  };
 
   const columns = useMemo<ColumnDef<PilgrimListItem>[]>(
     () => [

@@ -73,3 +73,13 @@ export class GroupNotFoundException extends NotFoundException {
     super({ error: "GROUP_NOT_FOUND", message: "Group not found" });
   }
 }
+
+export class BulkLimitExceededException extends BadRequestException {
+  constructor(limit: number) {
+    super({
+      error: "BULK_LIMIT_EXCEEDED",
+      message: `Maximum ${limit} items per request`,
+      limit,
+    });
+  }
+}

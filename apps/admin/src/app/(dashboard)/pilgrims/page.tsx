@@ -1,9 +1,10 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { EmptyPilgrims } from "@/components/empty-states/empty-pilgrims";
 import { EmptySearchResults } from "@/components/empty-states/empty-search-results";
 import { ErrorState } from "@/components/empty-states/error-state";
+import { BulkActionsBar } from "@/components/pilgrims/bulk-actions-bar";
 import { BulkImportDialog } from "@/components/pilgrims/bulk-import-dialog";
 import { DeletePilgrimDialog } from "@/components/pilgrims/delete-pilgrim-dialog";
 import { PilgrimDetailDrawer } from "@/components/pilgrims/pilgrim-detail-drawer";
@@ -67,6 +68,12 @@ export default function PilgrimsPage() {
     fullName: string;
   } | null>(null);
   const [importOpen, setImportOpen] = useState(false);
+  const [selection, setSelection] = useState<Record<string, boolean>>({});
+  const selectedIds = useMemo(
+    () => Object.keys(selection).filter((id) => selection[id]),
+    [selection],
+  );
+  const clearSelection = useCallback(() => setSelection({}), []);
 
   const hasFilters = Boolean(search || groupId || status);
   const clearFilters = () =>
@@ -119,6 +126,7 @@ export default function PilgrimsPage() {
         )
       ) : (
         <>
+          <BulkActionsBar selectedIds={selectedIds} onClear={clearSelection} />
           <PilgrimsTable
             rows={pilgrims.data?.items ?? []}
             isLoading={pilgrims.isLoading}
@@ -134,6 +142,8 @@ export default function PilgrimsPage() {
             onDelete={(row) =>
               setDeleteTarget({ id: row.id, fullName: row.fullName })
             }
+            selection={selection}
+            onSelectionChange={setSelection}
           />
           <PilgrimsPagination
             page={pilgrims.data?.page ?? page}

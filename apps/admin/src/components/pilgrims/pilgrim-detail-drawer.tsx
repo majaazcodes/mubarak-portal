@@ -29,6 +29,7 @@ import {
 import { ErrorState } from "@/components/empty-states/error-state";
 import { StatusBadge } from "./status-badge";
 import { QrImage } from "./qr-image";
+import { useDownloadPilgrimBadge } from "@/lib/hooks/api/use-badges";
 import { usePilgrim } from "@/lib/hooks/api/use-pilgrim";
 import { useQrForPilgrim, useRegenerateQr } from "@/lib/hooks/api/use-qr";
 import type { PilgrimDetail } from "@/lib/types/pilgrim";
@@ -262,6 +263,7 @@ function TravelTab({ pilgrim }: { pilgrim: PilgrimDetail }) {
 function QrTab({ pilgrimId }: { pilgrimId: string }) {
   const q = useQrForPilgrim(pilgrimId);
   const regen = useRegenerateQr(pilgrimId);
+  const download = useDownloadPilgrimBadge();
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   if (q.isLoading) {
@@ -297,10 +299,20 @@ function QrTab({ pilgrimId }: { pilgrimId: string }) {
         <Button
           variant="outline"
           className="flex-1"
-          disabled
-          title="Coming in Prompt #7"
+          onClick={() => download.mutate(pilgrimId)}
+          disabled={download.isPending || isRevoked}
+          title={
+            isRevoked
+              ? "Regenerate the QR before printing the badge"
+              : undefined
+          }
         >
-          <Download className="mr-2 h-4 w-4" aria-hidden /> Download badge (PDF)
+          {download.isPending ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden />
+          ) : (
+            <Download className="mr-2 h-4 w-4" aria-hidden />
+          )}
+          Download badge (PDF)
         </Button>
         <Button
           variant="outline"

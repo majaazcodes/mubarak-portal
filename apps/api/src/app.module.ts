@@ -10,6 +10,7 @@ import { HttpExceptionFilter } from "./common/filters/http-exception.filter";
 import { JwtAuthGuard } from "./common/guards/jwt-auth.guard";
 import { AuditInterceptor } from "./common/interceptors/audit.interceptor";
 import { AuthModule } from "./modules/auth/auth.module";
+import { BadgesModule } from "./modules/badges/badges.module";
 import { GroupsModule } from "./modules/groups/groups.module";
 import { HealthModule } from "./modules/health/health.module";
 import { PilgrimsModule } from "./modules/pilgrims/pilgrims.module";
@@ -95,6 +96,7 @@ import { UsersModule } from "./modules/users/users.module";
     QrModule,
     PilgrimsModule,
     GroupsModule,
+    BadgesModule,
     HealthModule,
   ],
   providers: [
