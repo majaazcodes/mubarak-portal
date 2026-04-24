@@ -79,10 +79,17 @@ async function forward(
     }
   }
 
-  const resBody = await upstream.arrayBuffer();
-  const res = new NextResponse(resBody, { status: upstream.status });
-  const ct = upstream.headers.get("content-type");
-  if (ct) res.headers.set("content-type", ct);
+  // HTTP 204/304 forbid a response body — passing even an empty ArrayBuffer
+  // to NextResponse here throws "Response with null body status cannot have
+  // body" in the Edge runtime. Skip the body for those statuses.
+  const status = upstream.status;
+  const noBody = status === 204 || status === 205 || status === 304;
+  const resBody = noBody ? null : await upstream.arrayBuffer();
+  const res = new NextResponse(resBody, { status });
+  if (!noBody) {
+    const ct = upstream.headers.get("content-type");
+    if (ct) res.headers.set("content-type", ct);
+  }
   const rid = upstream.headers.get("x-request-id");
   if (rid) res.headers.set("x-request-id", rid);
   return res;

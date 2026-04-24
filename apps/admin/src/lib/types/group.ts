@@ -15,3 +15,15 @@ export interface GroupWithPilgrimCount {
 export interface GroupListResponse {
   items: GroupWithPilgrimCount[];
 }
+
+// Mirrors apps/api/src/modules/groups/dto/create-group.dto.ts
+export interface CreateGroupInput {
+  name: string;
+  leaderUserId?: string;
+  departureDate?: string;
+  returnDate?: string;
+  maxSize?: number;
+  notes?: string;
+}
+
+export type UpdateGroupInput = Partial<CreateGroupInput>;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { EmptyPilgrims } from "@/components/empty-states/empty-pilgrims";
 import { EmptySearchResults } from "@/components/empty-states/empty-search-results";
 import { ErrorState } from "@/components/empty-states/error-state";
@@ -14,6 +14,7 @@ import { PilgrimsTable } from "@/components/pilgrims/pilgrims-table";
 import { PilgrimsToolbar } from "@/components/pilgrims/pilgrims-toolbar";
 import { useGroups } from "@/lib/hooks/api/use-groups";
 import { usePilgrims } from "@/lib/hooks/api/use-pilgrims";
+import { useNewShortcut } from "@/lib/hooks/use-new-shortcut";
 import { useQueryParams } from "@/lib/hooks/use-query-params";
 import type { PilgrimDetail, PilgrimStatus } from "@/lib/types/pilgrim";
 
@@ -75,6 +76,10 @@ export default function PilgrimsPage() {
       status: undefined,
       page: "1",
     });
+
+  // Cmd/Ctrl+N opens the create-pilgrim dialog from anywhere on this page.
+  const openCreate = useCallback(() => setFormState({ kind: "create" }), []);
+  useNewShortcut(openCreate);
 
   return (
     <div className="space-y-6">
