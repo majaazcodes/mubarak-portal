@@ -21,7 +21,12 @@ export function MobileNav(): React.ReactElement {
           <Menu className="h-5 w-5" />
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="w-60 p-0">
+      <SheetContent
+        side="left"
+        className="w-60 p-0"
+        srTitle="Navigation"
+        srDescription="Primary navigation for Mubarak Travels admin"
+      >
         <Sidebar onNavigate={() => setOpen(false)} />
       </SheetContent>
     </Sheet>

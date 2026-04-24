@@ -11,10 +11,17 @@ import {
 } from "@tanstack/react-table";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { differenceInYears, parseISO } from "date-fns";
-import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
+import { ArrowDown, ArrowUp, ArrowUpDown, MoreHorizontal } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -54,6 +61,8 @@ interface PilgrimsTableProps {
   isLoading: boolean;
   isFetching: boolean;
   onRowClick?: (id: string) => void;
+  onEdit?: (row: PilgrimListItem) => void;
+  onDelete?: (row: PilgrimListItem) => void;
 }
 
 export function PilgrimsTable({
@@ -61,6 +70,8 @@ export function PilgrimsTable({
   isLoading,
   isFetching,
   onRowClick,
+  onEdit,
+  onDelete,
 }: PilgrimsTableProps) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [selected, setSelected] = useState<Record<string, boolean>>({});
@@ -149,8 +160,51 @@ export function PilgrimsTable({
         cell: ({ row }) => <StatusBadge status={row.original.status} />,
         enableSorting: false,
       },
+      {
+        id: "actions",
+        header: () => <span className="sr-only">Actions</span>,
+        cell: ({ row }) => (
+          <div onClick={(e) => e.stopPropagation()}>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8"
+                  aria-label={`Actions for ${row.original.fullName}`}
+                >
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  onSelect={() => onRowClick?.(row.original.id)}
+                >
+                  View details
+                </DropdownMenuItem>
+                {onEdit ? (
+                  <DropdownMenuItem onSelect={() => onEdit(row.original)}>
+                    Edit
+                  </DropdownMenuItem>
+                ) : null}
+                <DropdownMenuSeparator />
+                {onDelete ? (
+                  <DropdownMenuItem
+                    onSelect={() => onDelete(row.original)}
+                    className="text-destructive focus:text-destructive"
+                  >
+                    Delete
+                  </DropdownMenuItem>
+                ) : null}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        ),
+        enableSorting: false,
+        size: 48,
+      },
     ],
-    [rows, selected],
+    [rows, selected, onRowClick, onEdit, onDelete],
   );
 
   const table = useReactTable({
