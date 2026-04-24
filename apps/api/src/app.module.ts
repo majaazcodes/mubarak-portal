@@ -13,6 +13,8 @@ import { AuthModule } from "./modules/auth/auth.module";
 import { GroupsModule } from "./modules/groups/groups.module";
 import { HealthModule } from "./modules/health/health.module";
 import { PilgrimsModule } from "./modules/pilgrims/pilgrims.module";
+import { QrModule } from "./modules/qr/qr.module";
+import { QueuesModule } from "./modules/queues/queues.module";
 import { RedisModule } from "./modules/redis/redis.module";
 import { UsersModule } from "./modules/users/users.module";
 
@@ -87,8 +89,10 @@ import { UsersModule } from "./modules/users/users.module";
       },
     }),
     RedisModule,
+    QueuesModule,
     UsersModule,
     AuthModule,
+    QrModule,
     PilgrimsModule,
     GroupsModule,
     HealthModule,

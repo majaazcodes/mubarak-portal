@@ -57,7 +57,7 @@ export class PilgrimsController {
   async create(
     @Body() dto: CreatePilgrimDto,
     @CurrentUser() user: RequestUser,
-  ): Promise<{ pilgrim: Pilgrim }> {
+  ): Promise<{ pilgrim: Pilgrim; qrToken: string }> {
     const agencyId = this.requireAgency(user);
     return this.pilgrims.create(dto, agencyId, user.id);
   }

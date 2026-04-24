@@ -56,6 +56,10 @@ describe("PilgrimsService", () => {
     invalidateQr: ReturnType<typeof vi.fn>;
     invalidateAgencyLists: ReturnType<typeof vi.fn>;
   };
+  let qr: {
+    createForPilgrim: ReturnType<typeof vi.fn>;
+    revoke: ReturnType<typeof vi.fn>;
+  };
   let svc: PilgrimsService;
 
   beforeEach(() => {
@@ -76,7 +80,13 @@ describe("PilgrimsService", () => {
       invalidateQr: vi.fn().mockResolvedValue(undefined),
       invalidateAgencyLists: vi.fn().mockResolvedValue(undefined),
     };
-    svc = new PilgrimsService(repo as never, cache as never);
+    qr = {
+      createForPilgrim: vi
+        .fn()
+        .mockResolvedValue({ token: "T".repeat(43), version: 1 }),
+      revoke: vi.fn().mockResolvedValue(undefined),
+    };
+    svc = new PilgrimsService(repo as never, cache as never, qr as never);
   });
 
   it("list clamps page and limit to safe bounds", async () => {
@@ -193,5 +203,22 @@ describe("PilgrimsService", () => {
     repo.softDelete.mockResolvedValueOnce(true);
     await svc.delete("p1", AGENCY_ID, USER_ID);
     expect(cache.invalidatePilgrim).toHaveBeenCalledWith("p1", AGENCY_ID);
+    expect(qr.revoke).toHaveBeenCalledWith("p1");
+  });
+
+  it("create issues QR token and returns it alongside pilgrim", async () => {
+    repo.create.mockResolvedValueOnce(buildPilgrim("p1"));
+    const res = await svc.create(
+      {
+        passportNo: "A8888888",
+        fullName: "New",
+        dob: "1970-01-01",
+        gender: "male",
+      },
+      AGENCY_ID,
+      USER_ID,
+    );
+    expect(qr.createForPilgrim).toHaveBeenCalledWith("p1");
+    expect(res.qrToken).toHaveLength(43);
   });
 });

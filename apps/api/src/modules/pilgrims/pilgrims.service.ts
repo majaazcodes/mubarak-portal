@@ -21,6 +21,7 @@ import type {
   PilgrimWithGroups,
 } from "./dto/pilgrim-summary.dto";
 import { PilgrimsRepository } from "./pilgrims.repository";
+import { QrService } from "../qr/qr.service";
 
 const LIST_CACHE_TTL_SEC = 30;
 const PILGRIM_CACHE_TTL_SEC = 60;
@@ -32,6 +33,7 @@ export class PilgrimsService {
   constructor(
     private readonly repo: PilgrimsRepository,
     private readonly cache: CacheService,
+    private readonly qr: QrService,
   ) {}
 
   async list(
@@ -88,7 +90,7 @@ export class PilgrimsService {
     dto: CreatePilgrimDto,
     agencyId: string,
     userId: string,
-  ): Promise<{ pilgrim: Pilgrim }> {
+  ): Promise<{ pilgrim: Pilgrim; qrToken: string }> {
     const exists = await this.repo.existsByPassport(agencyId, dto.passportNo);
     if (exists) throw new PassportDuplicateException(dto.passportNo);
 
@@ -108,6 +110,7 @@ export class PilgrimsService {
     };
 
     const pilgrim = await this.repo.create(input, dto.groupIds ?? []);
+    const { token } = await this.qr.createForPilgrim(pilgrim.id);
     await this.cache.invalidateAgencyLists(agencyId);
     await this.writeAudit(
       userId,
@@ -117,8 +120,7 @@ export class PilgrimsService {
       null,
       pilgrim,
     );
-    // NOTE: QR generation wired in Commit B. Current response omits qrToken.
-    return { pilgrim };
+    return { pilgrim, qrToken: token };
   }
 
   async update(
@@ -166,9 +168,9 @@ export class PilgrimsService {
     if (!before) throw new PilgrimNotFoundException();
     const ok = await this.repo.softDelete(id, agencyId);
     if (!ok) throw new PilgrimNotFoundException();
+    await this.qr.revoke(id);
     await this.cache.invalidatePilgrim(id, agencyId);
     await this.writeAudit(userId, agencyId, "delete", id, before, null);
-    // NOTE: QR revocation wired in Commit B.
   }
 
   private listCacheKey(agencyId: string, filters: object): string {
