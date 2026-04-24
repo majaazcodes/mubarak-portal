@@ -38,3 +38,28 @@ Mission-critical: real pilgrims depend on this.
 ## When stuck
 
 Ask the user before making architectural decisions.
+
+## Git Commit Rules (ABSOLUTE)
+
+1. **NEVER auto-commit without explicit user approval** — even for:
+   - CI failures
+   - Lint errors
+   - Config fixes
+   - "Production-ready" improvements
+   - Proactive cleanups
+
+2. **Workflow for all commits:**
+   - Identify problem
+   - Propose fix with exact scope (files, changes)
+   - Show diff preview
+   - WAIT for user approval
+   - Then commit
+
+3. **Atomic commits only** — no bundling unrelated changes.
+   - Bad: "fix(ci): resolve pnpm + also clean lint + also refactor types"
+   - Good: Three separate commits, each user-approved
+
+4. **User owns git history.** No surprises in `git log`.
+
+5. **If CI fails:** Stop work. Report problem. Wait for instructions.
+   Do NOT attempt autonomous fixes.
