@@ -12,6 +12,8 @@
     "stop:db": "docker compose -f infra/docker-compose.yml down",
     "dev:api": "pnpm --filter api dev",
     "dev:admin": "pnpm --filter admin dev",
+    "dev:mobile": "pnpm --filter mobile start --tunnel",
+    "tunnel:api": "cloudflared tunnel --url http://localhost:4000",
     "build:admin": "pnpm --filter admin build",
     "lint": "pnpm -r lint",
     "typecheck": "pnpm -r typecheck",

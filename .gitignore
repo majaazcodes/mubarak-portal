@@ -29,3 +29,8 @@ Thumbs.db
 .idea/
 
 drizzle/meta/
+
+# Local-only binaries (cloudflared dev tunnel etc. — install per README,
+# do not commit). Add more here if other vendor binaries land in the tree.
+cloudflared.exe
+cloudflared
