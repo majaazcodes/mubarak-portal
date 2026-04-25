@@ -19,6 +19,7 @@ const envSchema = z
     JWT_ACCESS_TTL: z.string().default("15m"),
     JWT_REFRESH_TTL: z.string().default("30d"),
     PORT: z.coerce.number().int().positive().default(4000),
+    HOST: z.string().min(1).default("0.0.0.0"),
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),

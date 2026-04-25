@@ -26,8 +26,17 @@ async function bootstrap(): Promise<void> {
   const cfg = app.get(ConfigService);
   const log = app.get(Logger);
 
-  const corsOrigin = cfg.getOrThrow<string>("CORS_ORIGIN");
+  // Split on commas so we can allow multiple dev origins (admin web at
+  // localhost + LAN IP, plus exp://… for the Expo dev client).
+  const corsOrigin = cfg
+    .getOrThrow<string>("CORS_ORIGIN")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
   const port = Number(cfg.getOrThrow<number>("PORT"));
+  // Bind to 0.0.0.0 (not 127.0.0.1) so the Expo dev client on a phone
+  // sharing the LAN can reach the laptop's IP at this port.
+  const host = cfg.getOrThrow<string>("HOST");
   const nodeEnv = cfg.getOrThrow<string>("NODE_ENV");
 
   await app.register(fastifyHelmet, {
@@ -77,10 +86,8 @@ async function bootstrap(): Promise<void> {
   process.once("SIGTERM", () => void shutdown("SIGTERM"));
   process.once("SIGINT", () => void shutdown("SIGINT"));
 
-  await app.listen(port, "0.0.0.0");
-  log.log(
-    `🚀 API listening on http://localhost:${port}/api/v1 [env=${nodeEnv}]`,
-  );
+  await app.listen(port, host);
+  log.log(`🚀 API listening on http://${host}:${port}/api/v1 [env=${nodeEnv}]`);
 }
 
 bootstrap().catch((err: unknown) => {
